@@ -141,6 +141,8 @@ susbstitute in
         <version>${kogito.bom.version}</version>
 ```
 
+(mandatory library)
+
 add in
 ```
 <project ...>
@@ -158,9 +160,22 @@ add in
 quarkus build
 ```
 
+after the build you will find a file with extension '.swidtag', eg:
+
+```
+ibm.com_IBM_Process_Automation_Manager_Open_Edition-9.0.1.swidtag
+```
+this file is the mandatory tag for license metric
+
 ### test the project
 
 ```
 quarkus dev
 ```
 
+## IBM BAMOE References
+
+https://www.ibm.com/support/pages/node/6999323
+
+Tracking the BAMOE License use in IBM License Metric Tool (ILMT)
+https://www.ibm.com/docs/en/ibamoe/9.0.x?topic=olmti-tracking-bamoe-license-use-in-license-metric-tool
