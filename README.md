@@ -171,6 +171,37 @@ this file is the mandatory tag for license metric
 quarkus dev
 ```
 
+## Build image and push to image registry
+
+login to image registry
+```
+podman login -u $QUAY_USER -p $QUAY_PWD quay.io
+```
+
+packae the artifacts
+```
+./mvnw package
+```
+
+build the image
+```
+podman build -f src/main/docker/Dockerfile.jvm -t quay.io/${REPO_NAME:bamoe}/my-quick-kogito-jvm .
+podman image ls
+```
+
+test locally
+```
+podman run -i --rm -p 8080:8080 quay.io/${REPO_NAME:local}/my-quick-kogito-jvm
+
+curl -ks -X 'POST' 'http://localhost:8080/pricing' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"Age": 22, "Previous incidents?": true}' | jq .
+```
+
+push the image to the registry
+```
+podman push quay.io/${REPO_NAME}/my-quick-kogito-jvm:latest
+```
+
+
 ## IBM BAMOE References
 
 IBM Business Automation Manager Open Editions 9.0.x
