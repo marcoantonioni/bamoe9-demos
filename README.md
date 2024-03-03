@@ -275,7 +275,7 @@ spec:
 EOF
 ```
 
-wait for deployment in status available
+wait for deployment status 'Available'
 ```
 oc wait -n ${_NAMESPACE} deployment/${_NAME} --for condition=Available --timeout=60s
 ```
