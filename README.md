@@ -123,7 +123,7 @@ add in
     <kogito.bom.version>9.0.1.Final</kogito.bom.version>
 ```
 
-susbstitute in
+susbstitute 'quarkus-kogito-bom' in
 ```
 <project ...>
   <dependencyManagement>
