@@ -1,0 +1,46 @@
+---
+openapi: 3.0.3
+info:
+  title: my-loan-kogito API
+  version: 1.0.0-SNAPSHOT
+paths:
+  /loan_pre_qualification:
+    get:
+      tags:
+      - Loan __pre __qualification Resource
+      responses:
+        "200":
+          description: OK
+          content:
+            application/xml:
+              schema:
+                type: string
+    post:
+      tags:
+      - Loan __pre __qualification Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /dmnDefinitions.json#/definitions/InputSet
+      responses:
+        default:
+          description: DMN output
+          content:
+            application/json:
+              schema:
+                $ref: /dmnDefinitions.json#/definitions/OutputSet
+  /loan_pre_qualification/dmnresult:
+    post:
+      tags:
+      - Loan __pre __qualification Resource
+      requestBody:
+        description: DMN input
+        content:
+          application/json:
+            schema:
+              $ref: /dmnDefinitions.json#/definitions/InputSet
+      responses:
+        "200":
+          description: OK

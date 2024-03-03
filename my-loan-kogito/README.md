@@ -13,6 +13,19 @@ You can run your application in dev mode that enables live coding using:
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
 
+## Test rule
+```shell script
+
+# accepted
+time curl -s -H 'accept: application/json' -H 'Content-Type: application/json' -X POST http://localhost:8080/loan_pre_qualification -d @./payloads/accepted.json | jq .
+
+# not accepted
+time curl -s -H 'accept: application/json' -H 'Content-Type: application/json' -X POST http://localhost:8080/loan_pre_qualification -d @./payloads/not-accepted.json | jq .
+
+
+```shell script
+
+
 ## Packaging and running the application
 
 The application can be packaged using:

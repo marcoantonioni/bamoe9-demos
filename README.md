@@ -320,6 +320,16 @@ _URL="https://"$(oc get route -n ${_NAMESPACE} ${_NAME} -o jsonpath='{.spec.host
 curl -ks -X 'POST' ${_URL}/pricing -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"Age": 42, "Previous incidents?": false}' | jq .
 ```
 
+## Export OpenAPI resources
+
+quarkus dev
+
+curl -sk -H 'accept: application/json' http://localhost:8080/q/openapi | jq . | sed 's/"\/dmnDefinitions.json#/#\//g' > ./openapi/openapi.json
+
+curl -sk -H 'accept: application/json' http://localhost:8080/dmnDefinitions.json | jq . > ./openapi/openapi-dmndefs.json
+
+
+
 ## IBM BAMOE References
 
 IBM Business Automation Manager Open Editions 9.0.x
