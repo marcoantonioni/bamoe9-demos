@@ -171,7 +171,7 @@ this file is the mandatory tag for license metric
 quarkus dev
 ```
 
-## Build image and push to image registry
+## Build image and push to registry
 
 login to image registry
 ```
@@ -201,6 +201,122 @@ push the image to the registry
 podman push quay.io/${REPO_NAME}/my-quick-kogito-jvm:latest
 ```
 
+## Update BAMOE version
+
+Install the new bamoe maven repo (mvn install:install-file...), update pom.xml tag 'kogito.bom.version' in 
+```
+<project ...>
+  <properties>
+    ...
+    <kogito.bom.version>9.0.'n'.Final</kogito.bom.version>
+```
+then build the project using 'quarkus build' command
+
+## Deploy to Openshift
+
+set env vars
+```
+_NAME="my-quick-kogito-jvm"
+_NAMESPACE="bamoe9-demos"
+_REPLICAS=1
+```
+
+create or change project
+```
+oc new-project ${_NAMESPACE}
+
+oc project ${_NAMESPACE}
+```
+
+create deployment
+```
+cat <<EOF | oc create -f -
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+  name: ${_NAME}
+  namespace: ${_NAMESPACE}
+  labels:
+    app: ${_NAME}
+spec:
+  replicas: ${_REPLICAS}
+  selector:
+    matchLabels:
+      app: ${_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${_NAME}
+        deployment: ${_NAME}
+    spec:
+      containers:
+        - name: ${_NAME}
+          image: 'quay.io/marco_antonioni/my-quick-kogito-jvm:latest'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+EOF
+```
+
+wait for deployment in status available
+```
+oc wait -n ${_NAMESPACE} deployment/${_NAME} --for condition=Available --timeout=60s
+```
+
+create service
+```
+oc expose deployment ${_NAME}
+```
+
+select the desired port name (eg: the one for 8080)
+```
+_PORT_NAME=$(oc get service ${_NAME} -o jsonpath='{.spec.ports}' | jq '.[] | select(.port == 8080)' | jq .name)
+```
+
+create the route
+```
+cat <<EOF | oc create -f -
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: ${_NAME}
+  namespace: ${_NAMESPACE}
+  labels:
+    app: ${_NAME}
+spec:
+  to:
+    kind: Service
+    name: ${_NAME}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: ''
+    destinationCACertificate: ''
+  port:
+    targetPort: ${_PORT_NAME}
+EOF
+```
+
+test the rule
+```
+_URL="https://"$(oc get route -n ${_NAMESPACE} ${_NAME} -o jsonpath='{.spec.host}')
+
+curl -ks -X 'POST' ${_URL}/pricing -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"Age": 42, "Previous incidents?": false}' | jq .
+```
 
 ## IBM BAMOE References
 
