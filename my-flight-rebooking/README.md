@@ -34,6 +34,7 @@ time curl -s -H 'accept: application/json' -H 'Content-Type: application/json' -
 
 The application can be packaged using:
 ```shell script
+quarkus build
 ./mvnw package
 ```
 It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.

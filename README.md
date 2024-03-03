@@ -178,8 +178,9 @@ login to image registry
 podman login -u $QUAY_USER -p $QUAY_PWD quay.io
 ```
 
-packae the artifacts
+build and package the artifacts
 ```
+quarkus build
 ./mvnw package
 ```
 
@@ -219,6 +220,7 @@ set env vars
 _NAME="my-quick-kogito-jvm"
 _NAMESPACE="bamoe9-demos"
 _REPLICAS=1
+_IMAGE_NAME="quay.io/marco_antonioni/my-quick-kogito-jvm:latest"
 ```
 
 create or change project
@@ -252,7 +254,7 @@ spec:
     spec:
       containers:
         - name: ${_NAME}
-          image: 'quay.io/marco_antonioni/my-quick-kogito-jvm:latest'
+          image: '${_IMAGE_NAME}'
           ports:
             - containerPort: 8080
               protocol: TCP
