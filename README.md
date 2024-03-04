@@ -195,6 +195,12 @@ test locally
 podman run -i --rm -p 8080:8080 quay.io/${REPO_NAME:local}/my-quick-kogito-jvm
 
 curl -ks -X 'POST' 'http://localhost:8080/pricing' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"Age": 22, "Previous incidents?": true}' | jq .
+
+curl -ks 'http://localhost:8080/q/health/ready' | jq .
+
+curl -ks 'http://localhost:8080/q/health/live' | jq .
+
+
 ```
 
 push the image to the registry
@@ -262,6 +268,21 @@ spec:
               protocol: TCP
             - containerPort: 8778
               protocol: TCP
+
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+            initialDelaySeconds: 7
+            periodSeconds: 7
+
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
