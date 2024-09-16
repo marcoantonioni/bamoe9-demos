@@ -502,6 +502,11 @@ http://localhost:8080/q/graphql-ui/
 
 ## IBM BAMOE References
 
+IBM Business Automation Manager Open Editions 9.1
+
+https://www.ibm.com/docs/en/ibamoe/9.1.x
+
+
 IBM Business Automation Manager Open Editions 9.0.x
 
 https://www.ibm.com/docs/en/ibamoe/9.0.x
