@@ -352,6 +352,152 @@ curl -sk -H 'accept: application/json' http://localhost:8080/q/openapi | jq . | 
 
 curl -sk -H 'accept: application/json' http://localhost:8080/dmnDefinitions.json | jq . > ./openapi/openapi-dmndefs.json
 
+## BAMOE v9.1 - Technology preview: Developing process services
+
+Project: jbpm-compact-architecture-quarkus-example from 'IBM Business Automation Manager Open Editions 9.1.0 - Examples Multiplatform English.zip'
+
+Use '9.1.0-ibm-0001' and 'bamoe-techpreview-bom' in pom.xml
+
+Comment out 'jbpm-quarkus-devui-bom' dependency in case of compile errors.
+
+Useful commands
+
+```
+
+#------------------------
+# clean
+mvn clean package
+
+#------------------------
+# clean and create container image
+mvn clean package -Pcontainer
+podman images
+
+#------------------------
+# run in dev mode
+mvn quarkus:dev -Pdevelopment
+
+#------------------------
+# clean and run in dev mode
+mvn clean package quarkus:dev -Pdevelopment
+
+
+#------------------------
+
+# full services
+./startServices.sh
+
+# minimal
+./startServices.sh example
+
+# if keycloak stops then comment out keycloak service from 'docker-compose.yaml'
+
+#------------------------
+# terminate all services
+docker compose down
+
+
+#------------------------
+# kill and remove local containers
+podman ps --all | grep -v CONT | awk '{print $1}' | xargs podman kill
+podman ps --all | grep -v CONT | awk '{print $1}' | xargs podman rm
+
+#------------------------
+# various curl commands
+
+# template processes list
+curl -s -X 'GET' \
+  'http://localhost:8080/management/processes' \
+  -H 'accept: */*'  | jq .
+
+# template details
+curl -s -X 'GET' \
+  'http://localhost:8080/management/processes/hiring' \
+  -H 'accept: */*'  | jq .
+
+
+#------------------------
+# processes / tasks
+
+# start process instances
+curl -s -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:8080/hiring -d '{"candidateData": { "name": "Jon", "lastName": "Snow", "email": "jon@snow.org", "experience": 5, "skills": ["Java", "Kogito", "Fencing"]}}' | jq .
+
+curl -s -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:8080/hiring -d '{"candidateData": { "name": "Jim", "lastName": "Rain", "email": "jim@rain.org", "experience": 3, "skills": ["Java"]}}' | jq .
+
+curl -s -H "Content-Type: application/json" -H "Accept: application/json" -X POST http://localhost:8080/hiring -d '{"candidateData": { "name": "Helen", "lastName": "Sun", "email": "helen@sun.org", "experience": 4, "skills": ["Java", "Kogito"]}}' | jq .
+
+
+# process instances list
+curl -s -X 'GET' \
+  'http://localhost:8080/hiring' \
+  -H 'accept: application/json' | jq .
+
+
+# process instance details
+PROCESS_ID=40692bc9-b337-4475-95fd-0510ae7aeabe
+curl -s -X 'GET' \
+  'http://localhost:8080/hiring/'${PROCESS_ID} \
+  -H 'accept: application/json' | jq .
+
+
+# tasks list
+PROCESS_ID=40692bc9-b337-4475-95fd-0510ae7aeabe
+curl -s -X 'GET' \
+  'http://localhost:8080/hiring/'${PROCESS_ID}'/tasks?user=jdoe' \
+  -H 'accept: application/json' | jq .
+
+
+# HRInterview task details
+PROCESS_ID=40692bc9-b337-4475-95fd-0510ae7aeabe
+TASK_ID=curl -s c9927705-c246-4f32-a0bb-28a95e5e71d8-X
+TASK_NAME=HRInterview
+curl -s -X 'GET' \
+  'http://localhost:8080/hiring/'${PROCESS_ID}'/'${TASK_NAME}'/'${TASK_ID}'?user=jdoe' \
+  -H 'accept: application/json' | jq .
+
+
+# HRInterview task completion
+PROCESS_ID=40692bc9-b337-4475-95fd-0510ae7aeabe
+TASK_ID=curl -s c9927705-c246-4f32-a0bb-28a95e5e71d8-X
+TASK_NAME=HRInterview
+curl -s -X 'POST' \
+  'http://localhost:8080/hiring/'${PROCESS_ID}'/'${TASK_NAME}'/'${TASK_ID}'?phase=complete&user=jdoe' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "offer": {
+    "category": "Software Engineer",
+    "salary": 39999
+  },
+  "approve": true
+}' | jq .
+
+
+# ITInterview task completion
+PROCESS_ID=40692bc9-b337-4475-95fd-0510ae7aeabe
+TASK_ID=550110ca-bb40-4a25-b9cb-d93467612f84
+TASK_NAME=ITInterview
+curl -s -X 'POST' \
+  'http://localhost:8080/hiring/'${PROCESS_ID}'/'${TASK_NAME}'/'${TASK_ID}'?phase=complete&user=jdoe' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "approve": true
+}' | jq .
+
+
+#------------------------
+# data audit (GraphQL)
+curl -H "Content-Type: application/json" -H "Accept: application/json" -s -X POST http://localhost:8080/data-audit/q/ -d '
+{
+    "query": "{GetAllProcessInstancesState {eventId, processInstanceId, eventType, eventDate}}"
+}' | jq .
+
+
+# GraphQL via browser
+http://localhost:8080/q/graphql-ui/
+```
+
 
 
 ## IBM BAMOE References
