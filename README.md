@@ -518,3 +518,8 @@ https://www.ibm.com/support/pages/node/6999323
 Tracking the BAMOE License use in IBM License Metric Tool (ILMT)
 
 https://www.ibm.com/docs/en/ibamoe/9.0.x?topic=olmti-tracking-bamoe-license-use-in-license-metric-tool
+
+
+BAMOE Developer Program
+
+https://ibm.biz/bamoe-developer-program
