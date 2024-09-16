@@ -2,12 +2,15 @@
 
 ## Setup your linux box
 
-### Install Java jdk
+### Install Java jdk (11 or 17)
 
 ```
 sudo dnf remove -y java*
 
 sudo dnf install -y java-11-openjdk
+
+sudo dnf install -y java-17-openjdk
+
 ```
 
 ### Install Quarkus CLI https://quarkus.io/get-started/
